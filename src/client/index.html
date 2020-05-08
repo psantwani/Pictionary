@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Drawing Game</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+  </head>
+  <body>
+    <div id="app">
+
+      <div id="home" >
+        <h1 style="padding: 30px 0 10px 0;">MOM.IO</h1>
+        <!-- <input id="username" type="text" placeholder="Enter Nickname" autocomplete="off" style="padding: 10px; width: 300px;"/> -->
+
+        <!-- <h3 style="padding: 30px 0 15px 0;">Start New Game</h3> -->
+        <ul>
+          <li><a href="#" data-room="5minutes" style="font-size: 28px;">⚡&nbsp;Start New Game</a>&nbsp;&nbsp;</li>
+          <!-- <li><span>⚡&nbsp;</span><a href="#" data-room="5minutes">5 mins</a>&nbsp;&nbsp;</li>
+          <li><span>🥁&nbsp;</span><a href="#" data-room="15minutes">15 mins</a>&nbsp;&nbsp;</li>
+          <li><span>🎨&nbsp;</span><a href="#" data-room="30minutes">30 mins</a></li> -->
+        </ul>
+
+        <h3 style="display: none;">Previous sessions</h3>
+        <ul class="previous-sessions"></ul>
+      </div>
+
+      <div id="gameplay" class="hidden">
+
+        <section class="sidebar">
+          <div class="info">
+            <div class="mode"></div>
+            <div class="sidebar-countdown"></div>
+            <a href="#">&laquo;Back</a>
+          </div>
+
+          <ul class="people"></ul>
+          <div class="chat">
+            <ul></ul>
+            <form onsubmit="">
+              <input type="text" placeholder="Chat" maxlength="120" />
+              <input type="submit" value="send" />
+            </form>
+          </div>
+        </section>
+
+        <section class="drawing-area">
+          <div class="spinner"><div></div><div></div><div></div><div></div></div>
+
+          <div class="status-area">
+            <div class="countdown-container">⏳&nbsp;<span class="countdown"></span></div>
+            <div class="points-container">💰&nbsp;<span id="points">0</span></div>
+          </div>
+
+          <div class="action-btn-area">
+            <p id="word-area">Word Hint Will Appear Here</p>
+            <button type="button" id="correct-answer" class="action-btn btn-success">Correct</button>
+          </div>
+
+          <div class="tools">
+
+            <input class="jscolor colorpicker" value="000000" style="width:100px; padding:4px"/>
+
+            <input type="radio" id="brush_p" name="brush" value="p" checked="checked" />
+            <label for="brush_p">🖌️</label>
+
+            <!-- <input type="radio" id="brush_m" name="brush" value="m" />
+            <label for="brush_m">Marker</label> -->
+
+            <!-- <input type="radio" id="brush_s" name="brush" value="s" />
+            <label for="brush_s">Sketch</label> -->
+
+            <input type="radio" id="brush_e" name="brush" value="e" />
+            <label for="brush_e">❌</label>
+
+            <input type="radio" id="clear-canvas-btn" name="brush" value="e" />
+            <label for="clear-canvas-btn">🔃</label>
+
+
+          </div>
+          <div class="canvas-area" style="text-align: center;">
+          <canvas class="drawing" width="800" height="600"></canvas>
+          <canvas class="drawing-preview" width="800" height="600"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <div id="drawing" class="hidden">
+        <canvas width="800" height="600"></canvas>
+      </div>
+
+    </div>
+  </body>
+</html>

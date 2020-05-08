@@ -1,0 +1,1 @@
+Simpler and mobile friendly version of the pictionary game like skribbl.io
