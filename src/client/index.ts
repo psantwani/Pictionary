@@ -3,7 +3,9 @@ import "./thirdparty/jscolor";
 import { showHome, hideHome } from "./pages/home";
 import { hideGameplay, showGameplay } from "./pages/gameplay";
 
-(<HTMLAudioElement> document.getElementById("player")).play();
+document.getElementById('player').addEventListener("click", (e) => {
+  (<HTMLAudioElement>document.getElementById("player")).play();
+});
 
 /**
  * Navigation
