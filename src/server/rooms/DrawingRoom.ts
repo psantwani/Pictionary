@@ -66,6 +66,7 @@ export class DrawingRoom extends Room<State> {
       } else if (command === "start-countdown") {
         this.broadcast([command, message[1]]);
       } else if (command === "show-answer") {
+        console.log(message);
         this.broadcast([command, message[1]]);
       } else if (command === "next-turn") {
         this.broadcast([command, message[1]]);

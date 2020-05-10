@@ -9,13 +9,16 @@ import { list } from '../utils/wordlist';
 let room: Room<State>;
 
 const COUNTDOWN_TIMER = 120;
+const NUMBER_OF_ROUNDS = 10;
 
 const gameplay = document.getElementById('gameplay');
 const clearCanvasBtn = document.getElementById('clear-canvas-btn');
 const countdownEl = gameplay.querySelector('.countdown');
 const wordAreaEl = document.getElementById('word-area');
 const pointsEl = document.getElementById('points');
-const correctBtnEl = <HTMLInputElement> document.getElementById('correct-answer');
+const correctBtnEl = <HTMLInputElement>document.getElementById('correct-answer');
+const roundEl = document.getElementById("round");
+document.getElementById("total-rounds").innerText = NUMBER_OF_ROUNDS.toString();
 
 const peopleEl = gameplay.querySelector('.people');
 const chatEl = gameplay.querySelector('.chat');
@@ -32,6 +35,9 @@ let currWord;
 let players = {};
 let wordListKeys = Object.keys(list);
 let countdownInterval;
+let round = 1;
+let willDraw = false;
+let willGuess = false;
 
 chatEl.querySelector('form').addEventListener('submit', (e) => {
   e.preventDefault();
@@ -132,7 +138,6 @@ export async function showGameplay(roomName: string) {
     } else if (cmd === "start-countdown") {
       startCountdown(data);
     } else if (cmd === "show-answer") {
-      console.log(data);
       showAnswerAndSwitchTurn(data);
     } else if (cmd === "next-turn") {
       nextTurn(data);
@@ -198,10 +203,13 @@ function startGameNotification(room) {
 
 
 function waitingForPlayerNotification(room) {
+  const path = location.href.split("/")[location.href.split("/").length - 1];
   let timerInterval;
   Swal.fire({
     title: 'Waiting for Players!',
-    html: 'Game will wait for <b></b> seconds for other players to join.',
+    html: `<p>Game will wait for <b></b> seconds for other players to join.<p>
+      <input onClick="this.select();" type='text' value='https://tinyurl.com/pwrcf/${path}' style="border:1px solid; border-radius:5px; margin-top:10px; width:200px; padding:10px" />
+    `,
     timer: 180000,
     timerProgressBar: true,
     onBeforeOpen: () => {
@@ -226,13 +234,17 @@ function waitingForPlayerNotification(room) {
 }
 
 function oneTurn() {
+  if (round == (NUMBER_OF_ROUNDS + 1)) {
+    showGameOverNotification();
+    return;
+  }
   correctBtnEl.disabled = true;
   currWord = "";
   countdownEl.innerHTML = "";
   clearCanvas(ctx);
   clearCanvas(prevCtx);
-  let willDraw = false;
-  let willGuess = false;
+  willDraw = false;
+  willGuess = false;
   if (myPlayerId == currTurnToDraw) {
     willDraw = true;
   } else {
@@ -263,6 +275,40 @@ function oneTurn() {
   }
 }
 
+function showGameOverNotification() {
+  let winner = "Both";
+  if (myPlayerScore > oppositionPlayerScore) {
+    winner = players[myPlayerId];
+  } else if (oppositionPlayerScore > myPlayerScore) {
+    winner = players[oppositionPlayerId];
+  }
+  let timerInterval;
+  Swal.fire({
+    title: `🏆 ${winner} won. 🏆`,
+    html: `<table>
+            <tr>
+              <th>Player</th><th>Score</th>
+            </tr>
+            <tr>
+              <td>${players[myPlayerId]}</td><td>${myPlayerScore}</td>
+            </tr>
+            <tr>
+            <td>${players[oppositionPlayerId]}</td><td>${oppositionPlayerScore}</td>
+            </tr>
+          </table>`,
+    timer: 10000,
+    timerProgressBar: true,
+    onBeforeOpen: () => {
+      Swal.showLoading()
+      timerInterval = setInterval(() => {
+      }, 1000)
+    },
+    onClose: () => {
+      location.href = "/";
+    }
+  });
+}
+
 async function chooseWordAndStartCountdown() {
   if (myPlayerId == currTurnToDraw) {
     const { value: word } = await Swal.fire({
@@ -273,7 +319,11 @@ async function chooseWordAndStartCountdown() {
       showCancelButton: false,
       inputValidator: (value) => {
         return new Promise((resolve) => {
-          resolve()
+          if (value) {
+            resolve();
+          } else {
+            resolve('You need to select a word :)')
+          }
         })
       }
     })
@@ -328,49 +378,47 @@ function startCountdown(currTurnToDraw) {
     value--;
     if (value < 0) {
       showToast("Time is up", "error");
-      clearInterval(countdownInterval);
       room.send(['show-answer', false]);
     }
   }, 1000);
 }
 
 function showAnswerAndSwitchTurn(guessed) {
-  scoreCalculation(guessed);
-  if (countdownInterval) {
-    clearInterval(countdownInterval);
-  }
-  let timerInterval;
-  Swal.fire({
-    title: `Answer: ${currWord}`,
-    html: `<table>
-            <tr>
-              <th>Player</th><th>Score</th>
-            </tr>
-            <tr>
-              <td>${players[myPlayerId]}</td><td>${myPlayerScore}</td>
-            </tr>
-            <tr>
-            <td>${players[oppositionPlayerId]}</td><td>${oppositionPlayerScore}</td>
-            </tr>
-          </table>`,
-    timer: 5000,
-    timerProgressBar: true,
-    onBeforeOpen: () => {
-      Swal.showLoading()
-      timerInterval = setInterval(() => {
-      }, 1000)
-    },
-    onClose: () => {
-      if (currTurnToDraw == myPlayerId) {
-        let nextPlayerToDraw = currTurnToDraw == myPlayerId ? oppositionPlayerId : myPlayerId;
-        room.send(['next-turn', nextPlayerToDraw]);
-      }
+    scoreCalculation(guessed);
+    if (countdownInterval) {
+      clearInterval(countdownInterval);
     }
-  });
+    let timerInterval;
+    Swal.fire({
+      title: `Answer: ${currWord}`,
+      html: `<table>
+              <tr>
+                <th>Player</th><th>Score</th>
+              </tr>
+              <tr>
+                <td>${players[myPlayerId]}</td><td>${myPlayerScore}</td>
+              </tr>
+              <tr>
+              <td>${players[oppositionPlayerId]}</td><td>${oppositionPlayerScore}</td>
+              </tr>
+            </table>`,
+      timer: 5000,
+      timerProgressBar: true,
+      onBeforeOpen: () => {
+        Swal.showLoading()
+        timerInterval = setInterval(() => {
+        }, 1000)
+      },
+      onClose: () => {
+        if (willDraw) {
+          let nextPlayerToDraw = currTurnToDraw == myPlayerId ? oppositionPlayerId : myPlayerId;
+          room.send(['next-turn', nextPlayerToDraw]);
+        }
+      }
+    });
 }
 
 function scoreCalculation(guessed) {
-  console.log("scoreCalculation", guessed);
   if (guessed) {
     if (currTurnToDraw == myPlayerId) {
       myPlayerScore += 50;
@@ -384,6 +432,10 @@ function scoreCalculation(guessed) {
 }
 
 function nextTurn(nextToDraw) {
+  round += 0.5;
+  if (round < NUMBER_OF_ROUNDS) {
+    roundEl.innerText = Math.floor(round).toString();
+  }
   currTurnToDraw = nextToDraw;
   room.send(['one-turn']);
 }
