@@ -20,7 +20,7 @@ import { monitor } from "@colyseus/monitor";
 
 import { DrawingRoom } from "./rooms/DrawingRoom";
 
-export const port = Number(process.env.PORT || 8080);
+export const port = Number(process.env.PICTIONARY_PORT || 8080);
 export const endpoint = "localhost";
 
 export let STATIC_DIR: string;
