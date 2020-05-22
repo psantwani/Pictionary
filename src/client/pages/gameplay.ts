@@ -208,7 +208,7 @@ function waitingForPlayerNotification(room) {
   Swal.fire({
     title: 'Waiting for Players!',
     html: `<p>Game will wait for <b></b> seconds for other players to join.<p>
-      <input onClick="this.select();" type='text' value='https://tinyurl.com/pwrcf/${path}' style="border:1px solid; border-radius:5px; margin-top:10px; width:200px; padding:10px" />
+      <input onClick="this.select();" type='text' value='http://http://piyushgames.mooo.com/${path}' style="border:1px solid; border-radius:5px; margin-top:10px; width:200px; padding:10px" />
     `,
     timer: 180000,
     timerProgressBar: true,
